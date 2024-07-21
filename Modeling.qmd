@@ -6,4 +6,4 @@
 
 ### Link to EDA Site:
 
-[Click here for the Modeling Page](EDA.html)
+[Click here for the EDA Page](EDA.html)
