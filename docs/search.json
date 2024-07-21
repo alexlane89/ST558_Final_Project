@@ -1,0 +1,16 @@
+[
+  {
+    "objectID": "EDA.html",
+    "href": "EDA.html",
+    "title": "EDA Quarto File",
+    "section": "",
+    "text": "EDA Quarto File\n\nThis is the initial Exploratory Data Analysis file which will examine the Diabetes Health Indicators data set."
+  },
+  {
+    "objectID": "Modeling.html",
+    "href": "Modeling.html",
+    "title": "Modeling Quarto File",
+    "section": "",
+    "text": "Modeling Quarto File\n\nThis is the Modeling file which will be used to construct and evaluate different model fits for predictive modeling of Diabetes Health Indicators."
+  }
+]
