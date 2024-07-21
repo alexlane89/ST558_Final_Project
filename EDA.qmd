@@ -1,3 +1,8 @@
 # EDA Quarto File
 
 > This is the initial Exploratory Data Analysis file which will examine the Diabetes Health Indicators data set.
+
+
+### Link to Modeling Site:
+
+[Click here for the Modeling Page](Modeling.html)
