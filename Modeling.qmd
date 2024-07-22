@@ -2,6 +2,14 @@
 
 > This is the Modeling file which will be used to construct and evaluate different model fits for predictive modeling of Diabetes Health Indicators.
 
+```{r}
+set.seed(90)
+#trainIndex <- createDataPartition(, p = 0.7, list = FALSE)
+#heartTrain <- heart_4[trainIndex, ]
+#heartTest <- heart_4[-trainIndex, ]
+```
+
+
 
 
 ### Link to EDA Site:

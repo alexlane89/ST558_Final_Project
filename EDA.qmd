@@ -2,6 +2,41 @@
 
 > This is the initial Exploratory Data Analysis file which will examine the Diabetes Health Indicators data set.
 
+## Introduction to Data
+> The Behavioral Risk Factor Surveillance System (BRFSS) conducts yearly phone surveys in the United States. The surveys include questions for Americans about their health status and care choices. Our data set is a subset of the BRFSS survey calls from 2015 which focus on diabetes-related survey responses.
+
+| Diabetes_binary | HighBP | HighChol | CholCheck | BMI | Smoker | Stroke |
+|-----------------|:-------|---------:|:----------|----:|:-------|-------:|
+|      Class      | Class  |   Class  |   Class   | Num | Class  |  Class |
+|        0        |   0    |     0    |     0     |     |   0    |    0   |
+|        1        |   1    |     1    |     1     |     |   1    |    1   |
+
+| HeartDiseaseorAngina | PhysActivty | Fruits |
+|----------------------|:------------|-------:|
+|         Class        |    Class    | Class  |
+|           0          |      0      |   0    |
+|           1          |      1      |   1    |
+
+: Diabetes Survey Response variables - columns and their type.
+
+### Exploratory Discussion
+
+> Start by activiting the necessary packages
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+```
+
+
+> Insert comments on which predictors 
+
+```{r}
+diabetes <- read_csv("diabetes_binary_health_indicators_BRFSS2015.csv")
+
+head(diabetes)
+```
+
+
 
 ### Link to Modeling Site:
 

@@ -4,7 +4,7 @@
     "href": "EDA.html",
     "title": "EDA Quarto File",
     "section": "",
-    "text": "EDA Quarto File\n\nThis is the initial Exploratory Data Analysis file which will examine the Diabetes Health Indicators data set.\n\n\nLink to Modeling Site:\nClick here for the Modeling Page"
+    "text": "This is the initial Exploratory Data Analysis file which will examine the Diabetes Health Indicators data set.\n\n\n\n\nThe Behavioral Risk Factor Surveillance System (BRFSS) conducts yearly phone surveys in the United States. The surveys include questions for Americans about their health status and care choices. Our data set is a subset of the BRFSS survey calls from 2015 which focus on diabetes-related survey responses.\n\n\n\n\n\n\n\n\n\n\n\n\n\nDiabetes_binary\nHighBP\nHighChol\nCholCheck\nBMI\nSmoker\nStroke\n\n\n\n\nClass\nClass\nClass\nClass\nNum\nClass\nClass\n\n\n0\n0\n0\n0\n\n0\n0\n\n\n1\n1\n1\n1\n\n1\n1\n\n\n\n\nDiabetes Survey Response variables - columns and their type.\n\n\nHeartDiseaseorAngina\nPhysActivty\nFruits\n\n\n\n\nClass\nClass\nClass\n\n\n0\n0\n0\n\n\n1\n1\n1\n\n\n\n\n\nClick here for the Modeling Page"
   },
   {
     "objectID": "Modeling.html",
@@ -12,5 +12,12 @@
     "title": "Modeling Quarto File",
     "section": "",
     "text": "Modeling Quarto File\n\nThis is the Modeling file which will be used to construct and evaluate different model fits for predictive modeling of Diabetes Health Indicators.\n\n\nLink to EDA Site:\nClick here for the Modeling Page"
+  },
+  {
+    "objectID": "EDA.html#introduction-to-data",
+    "href": "EDA.html#introduction-to-data",
+    "title": "EDA Quarto File",
+    "section": "",
+    "text": "The Behavioral Risk Factor Surveillance System (BRFSS) conducts yearly phone surveys in the United States. The surveys include questions for Americans about their health status and care choices. Our data set is a subset of the BRFSS survey calls from 2015 which focus on diabetes-related survey responses.\n\n\n\n\n\n\n\n\n\n\n\n\n\nDiabetes_binary\nHighBP\nHighChol\nCholCheck\nBMI\nSmoker\nStroke\n\n\n\n\nClass\nClass\nClass\nClass\nNum\nClass\nClass\n\n\n0\n0\n0\n0\n\n0\n0\n\n\n1\n1\n1\n1\n\n1\n1\n\n\n\n\nDiabetes Survey Response variables - columns and their type.\n\n\nHeartDiseaseorAngina\nPhysActivty\nFruits\n\n\n\n\nClass\nClass\nClass\n\n\n0\n0\n0\n\n\n1\n1\n1\n\n\n\n\n\nClick here for the Modeling Page"
   }
 ]
