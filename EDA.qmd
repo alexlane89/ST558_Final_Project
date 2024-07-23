@@ -86,9 +86,8 @@ summary(diabetes$BMI)
 diab2 <- diabetes |>
   mutate(DiabetesStatus = 
            ifelse(Diabetes_binary == 0, "No",
-                  ifelse(Diabetes_binary == 1, "Pre",
-                         ifelse(Diabetes_binary == 2, "Diabetes",
-                                "ERROR")))) |>
+                  ifelse(Diabetes_binary == 1, "Yes",
+                         "ERROR"))) |>
   select(!Diabetes_binary)
 diab2$DiabetesStatus <- as.factor(diab2$DiabetesStatus)
 
