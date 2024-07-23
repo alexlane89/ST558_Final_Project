@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -171,6 +205,153 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
+<section id="exploratory-discussion" class="level3">
+<h3 class="anchored" data-anchor-id="exploratory-discussion">Exploratory Discussion</h3>
+<blockquote class="blockquote">
+<p>Start by activiting the necessary packages</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p>Insert comments on which predictors</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>diabetes <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"diabetes_binary_health_indicators_BRFSS2015.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 253680 Columns: 22
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+dbl (22): Diabetes_binary, HighBP, HighChol, CholCheck, BMI, Smoker, Stroke,...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span>(diabetes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>cols(
+  Diabetes_binary = col_double(),
+  HighBP = col_double(),
+  HighChol = col_double(),
+  CholCheck = col_double(),
+  BMI = col_double(),
+  Smoker = col_double(),
+  Stroke = col_double(),
+  HeartDiseaseorAttack = col_double(),
+  PhysActivity = col_double(),
+  Fruits = col_double(),
+  Veggies = col_double(),
+  HvyAlcoholConsump = col_double(),
+  AnyHealthcare = col_double(),
+  NoDocbcCost = col_double(),
+  GenHlth = col_double(),
+  MentHlth = col_double(),
+  PhysHlth = col_double(),
+  DiffWalk = col_double(),
+  Sex = col_double(),
+  Age = col_double(),
+  Education = col_double(),
+  Income = col_double()
+)</code></pre>
+</div>
+</div>
+<section id="variable-descriptions" class="level4">
+<h4 class="anchored" data-anchor-id="variable-descriptions">Variable Descriptions</h4>
+<blockquote class="blockquote">
+<p>The output above lists all the variables/columns associated with the BRFSS binary indicators dataset from 2015. See below for an explanation of the variables in question:</p>
+</blockquote>
+<p><strong>Diabetes_binary</strong>: An assessment of diabetes status of the individual respondent with 3 levels:</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: right;">0</th>
+<th style="text-align: center;">1</th>
+<th style="text-align: center;">2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">No Diabetes</td>
+<td style="text-align: center;">Pre-Diabetes</td>
+<td style="text-align: center;">Diabetes</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="blockquote">
+<p>Clean up data - identify NA’ed rows. I would like to identify if there are any columns with NA values.</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>NA_vec <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">seq_along</span>(diabetes))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(NA_vec) <span class="ot">&lt;-</span> <span class="fu">names</span>(diabetes)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(diabetes)) {</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  NA_vec[i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(diabetes[i]))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>NA_vec</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Diabetes_binary               HighBP             HighChol 
+                   0                    0                    0 
+           CholCheck                  BMI               Smoker 
+                   0                    0                    0 
+              Stroke HeartDiseaseorAttack         PhysActivity 
+                   0                    0                    0 
+              Fruits              Veggies    HvyAlcoholConsump 
+                   0                    0                    0 
+       AnyHealthcare          NoDocbcCost              GenHlth 
+                   0                    0                    0 
+            MentHlth             PhysHlth             DiffWalk 
+                   0                    0                    0 
+                 Sex                  Age            Education 
+                   0                    0                    0 
+              Income 
+                   0 </code></pre>
+</div>
+</div>
+<blockquote class="blockquote">
+<p>There are no NAs in any of the columns, so no omitting of rows for that particular reason is required.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>One unique challenge or assessment of this data set is that all variables except for BMI are binary and/or classes. They are all double/numeric type columns with integers denoting a factored response to an associated question, whether it be a binary Yes/No, or a grouped category like education level (with levels 1-6) With that said, we can get som summary statistics and distribution information around the only continuous variable: BMI.</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> diabetes, <span class="fu">aes</span>(<span class="at">x=</span>BMI))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>b <span class="sc">+</span> <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"BMI Histogram"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="EDA_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p>Summary Statistics for BMI:</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(diabetes<span class="sc">$</span>BMI)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  12.00   24.00   27.00   28.38   31.00   98.00 </code></pre>
+</div>
+</div>
+<blockquote class="blockquote">
+<p>The maximum identification of 98 is helpful for this exercise, because it’s difficult to see the outlier values from the histogram.</p>
+</blockquote>
+</section>
+</section>
+<section id="data-manipulation" class="level3">
+<h3 class="anchored" data-anchor-id="data-manipulation">Data Manipulation</h3>
+<blockquote class="blockquote">
+<p>To support the model development, I will convert the target variable: Diabetes_binary to a factor column with Yes or No values.</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>diab2 <span class="ot">&lt;-</span> diabetes <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
 <section id="link-to-modeling-site" class="level3">
 <h3 class="anchored" data-anchor-id="link-to-modeling-site">Link to Modeling Site:</h3>
 <p><a href="Modeling.html">Click here for the Modeling Page</a></p>

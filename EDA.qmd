@@ -25,6 +25,7 @@
 
 ```{r, warning=FALSE, message=FALSE}
 library(tidyverse)
+library(ggplot2)
 ```
 
 
@@ -33,9 +34,66 @@ library(tidyverse)
 ```{r}
 diabetes <- read_csv("diabetes_binary_health_indicators_BRFSS2015.csv")
 
-head(diabetes)
+spec(diabetes)
 ```
 
+#### Variable Descriptions
+
+> The output above lists all the variables/columns associated with the BRFSS binary indicators dataset from 2015. See below for an explanation of the variables in question:
+
+**Diabetes_binary**: An assessment of diabetes status of the individual respondent with 3 levels:
+
+|         0       |      1       |     2    |
+|:---------------:|:------------:|:--------:|
+|   No Diabetes   | Pre-Diabetes | Diabetes |
+
+> Clean up data - identify NA'ed rows. I would like to identify if there are any columns with NA values.
+
+```{r}
+NA_vec <- c(seq_along(diabetes))
+names(NA_vec) <- names(diabetes)
+
+for (i in seq_along(diabetes)) {
+  NA_vec[i] <- sum(is.na(diabetes[i]))
+}
+
+NA_vec
+```
+> There are no NAs in any of the columns, so no omitting of rows for that particular reason is required.
+
+> One unique challenge or assessment of this data set is that all variables except for BMI are binary and/or classes. They are all double/numeric type columns with integers denoting a factored response to an associated question, whether it be a binary Yes/No, or a grouped category like education level (with levels 1-6)
+> With that said, we can get som summary statistics and distribution information around the only continuous variable: BMI.
+
+```{r}
+b <- ggplot(data = diabetes, aes(x=BMI))
+b + geom_histogram(binwidth = 5) +
+  labs(title = "BMI Histogram")
+```
+
+> Summary Statistics for BMI:
+
+```{r}
+summary(diabetes$BMI)
+```
+
+> The maximum identification of 98 is helpful for this exercise, because it's difficult to see the outlier values from the histogram.
+
+### Data Manipulation
+
+> To support the model development, I will convert the target variable: Diabetes_binary to a factor column with status of "No", "Pre", "Diabetes"
+
+```{r}
+diab2 <- diabetes |>
+  mutate(DiabetesStatus = 
+           ifelse(Diabetes_binary == 0, "No",
+                  ifelse(Diabetes_binary == 1, "Pre",
+                         ifelse(Diabetes_binary == 2, "Diabetes",
+                                "ERROR")))) |>
+  select(!Diabetes_binary)
+diab2$DiabetesStatus <- as.factor(diab2$DiabetesStatus)
+
+(diab2)
+```
 
 
 ### Link to Modeling Site:
