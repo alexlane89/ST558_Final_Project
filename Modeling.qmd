@@ -24,7 +24,8 @@ diabTest <- diab2[-trainIndex, ]
 > Create the training object
 
 ```{r}
-trctrl <- trainControl(method = "repeatedcv", number = 5, repeats = 3)
+trctrl <- trainControl(method = "cv", number = 5, classProbs = TRUE,
+                       summaryFunction = mnLogLoss)
 set.seed(56)
 ```
 
@@ -36,8 +37,8 @@ set.seed(56)
 (glmFit1 <- train(DiabetesStatus ~ Age,
                  data = diabTrain,
                  method = "glm",
-                 trControl=trctrl,
-                 metric = "logLoss"))
+                 metric = "logLoss",
+                 trControl=trctrl))
 ```
 
 > Next use a model incorporating age & BMI:
@@ -46,18 +47,18 @@ set.seed(56)
 (glmFit2 <- train(DiabetesStatus ~ Age*BMI,
                  data = diabTrain,
                  method = "glm",
-                 trControl=trctrl,
-                 metric = "logLoss"))
+                 metric = "logLoss",
+                 trControl=trctrl))
 ```
 
 > Finally, a model incorporating Education, Income, and their interaction effects:
 
 ```{r}
-(glmFit1 <- train(DiabetesStatus ~ Education*Income,
+(glmFit3 <- train(DiabetesStatus ~ Education*Income,
                  data = diabTrain,
                  method = "glm",
-                 trControl=trctrl,
-                 metric = "logLoss"))
+                 metric = "logLoss",
+                 trControl=trctrl))
 ```
 
 ### Classification Tree
