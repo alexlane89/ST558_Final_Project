@@ -8,6 +8,7 @@
 library(tidyverse)
 library(ggplot2)
 library(caret)
+library(ranger)
 ```
 
 > Partition the data set into training & test sets
@@ -62,6 +63,28 @@ set.seed(56)
 ```
 
 ### Classification Tree
+
+```{r}
+(treeFit1 <- train(DiabetesStatus ~ .,
+                  data = diab2,
+                  method = "rpart",
+                  trControl=trctrl,
+                  preProcess = c("center", "scale"),
+                  tuneGrid = data.frame(cp = seq(0, 0.1, by = 0.01)),
+                  metric = "logLoss"))
+```
+
+### Random Forest
+
+```{r}
+(treeFit2 <- train(DiabetesStatus ~ .,
+                  data = diab2,
+                  method = "ranger",
+                  trControl=trctrl,
+                  preProcess = c("center", "scale"),
+                  metric = "logLoss",
+                  tuneLength = 3))
+```
 
 
 
