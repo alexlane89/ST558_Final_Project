@@ -9,6 +9,7 @@ library(tidyverse)
 library(ggplot2)
 library(caret)
 library(ranger)
+library(Metrics)
 ```
 
 > Partition the data set into training & test sets
@@ -32,6 +33,7 @@ set.seed(56)
 
 ### Logistic Regression Models
 
+#### Age
 > Starting with a model only dependent upon age
 
 ```{r}
@@ -42,7 +44,8 @@ set.seed(56)
                  trControl=trctrl))
 ```
 
-> Next use a model incorporating age & BMI:
+#### Age & BMI
+> Next use a model incorporating age & BMI, with interaction effects:
 
 ```{r}
 (glmFit2 <- train(DiabetesStatus ~ Age*BMI,
@@ -52,6 +55,7 @@ set.seed(56)
                  trControl=trctrl))
 ```
 
+#### Education & Income
 > Finally, a model incorporating Education, Income, and their interaction effects:
 
 ```{r}
@@ -65,7 +69,7 @@ set.seed(56)
 ### Classification Tree
 
 ```{r}
-(treeFit1 <- train(DiabetesStatus ~ .,
+(treeFit1 <- train(DiabetesStatus ~ BMI*GenHlth,
                   data = diab2,
                   method = "rpart",
                   trControl=trctrl,
@@ -86,7 +90,56 @@ set.seed(56)
                   tuneLength = 3))
 ```
 
+> Using this random forest method and the 'ranger' package which randomly select supporting parameters, the value of 'mtry' for a random forest model which minimizes logLoss value is mtry = 2.
 
+### Final Model Selection
+
+> Let's select the best model based on using the various training methodologies on the test set. The three models in question are the best results from the Logistic Regression, Classification Tree, and Random Forest models.
+> For Logistic Regression, the lowest logLoss function result was the formula analyzing Age, BMI, and their interaction effects.
+> For Classification Tree - with predictors of BMI, General Health, and their interaction effects, the lowest logLoss function result was associated with the cp (complexity parameter) of 0.
+> For The Random Forest, the lowest logLoss function result was associated with an mtry of 2.
+
+> First, we need to predict values using each model on the test set
+
+#### GLM Prediction
+
+```{r}
+(glmpred <- predict(glmFit2, diabTest, type = "prob"))
+```
+
+```{r, warning=FALSE}
+(logLoss(diabetes$Diabetes_binary, glmpred$Yes))
+```
+
+#### Classification Tree Prediction
+
+```{r}
+(ctpred <- predict(treeFit1, diabTest, type = "prob"))
+```
+
+```{r, warning=FALSE}
+(logLoss(diabetes$Diabetes_binary, ctpred$Yes))
+```
+
+#### Random Forest Prediction
+
+```{r}
+(rfpred <- predict(treeFit2, diabTest, type = "prob"))
+```
+
+```{r, warning=FALSE}
+logLoss(diabetes$Diabetes_binary, rfpred$Yes)
+```
+
+### Model Selection
+
+> The final logLoss results from each of the 3 best iterations of each model, result in the following:
+
+|          Model        |   logLoss   |
+|----------------------:|:-----------:|
+|     GLM (Age*BMI)     |   0.4492    |
+|  Classification Tree  |   0.4422    |
+|     Random Forest     |   0.4833    |
 
 ### Link to EDA Site:
 
