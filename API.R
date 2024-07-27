@@ -1,6 +1,22 @@
 #API.R 
 library(GGally)
 library(leaflet)
+library(tidyverse)
+
+#Read in diabetes data
+diabapi <- read_csv("diabetes_binary_health_indicators_BRFSS2015.csv")
+
+#Convert read-in dataframe such that Diabetes binary result is a class
+diabapi2 <- diabetes |>
+  mutate(DiabetesStatus = 
+           ifelse(Diabetes_binary == 0, "No",
+                  ifelse(Diabetes_binary == 1, "Yes",
+                         "ERROR"))) |>
+  select(!Diabetes_binary)
+
+#Convert Diabetes Status to factor
+diab2$DiabetesStatus <- as.factor(diab2$DiabetesStatus)
+
 
 #Send a message
 #* @get /readme

@@ -87,8 +87,7 @@ diab2 <- diabetes |>
   mutate(DiabetesStatus = 
            ifelse(Diabetes_binary == 0, "No",
                   ifelse(Diabetes_binary == 1, "Yes",
-                         "ERROR"))) |>
-  select(!Diabetes_binary)
+                         "ERROR")))
 diab2$DiabetesStatus <- as.factor(diab2$DiabetesStatus)
 
 (diab2)
@@ -104,7 +103,7 @@ pairs(~ Age + Education + Income, data = diab2)
 > More plots
 
 ```{r}
-distSum <- diabetes |>
+distSum <- diab2 |>
   group_by(Age) |>
   summarize(propDiabetes = mean(Diabetes_binary),
             n = n()) |>
@@ -114,7 +113,7 @@ ggplot(distSum, aes(x=Age, y=propDiabetes)) +
 ```
 
 ```{r}
-Inc_Prop <- diabetes |>
+Inc_Prop <- diab2 |>
   group_by(Income) |>
   summarize(propDiabetes = mean(Diabetes_binary),
             n = n()) |>
@@ -124,7 +123,7 @@ ggplot(Inc_Prop, aes(x=Income, y=propDiabetes)) +
 ```
 
 ```{r}
-Inc_Prop <- diabetes |>
+Inc_Prop <- diab2 |>
   group_by(Education) |>
   summarize(propDiabetes = mean(Diabetes_binary),
             n = n()) |>
@@ -134,7 +133,7 @@ ggplot(Inc_Prop, aes(x=Education, y=propDiabetes)) +
 ```
 
 ```{r}
-BMI_Prop <- diabetes |>
+BMI_Prop <- diab2 |>
   group_by(BMI) |>
   summarize(propDiabetes = mean(Diabetes_binary),
             n = n()) |>
@@ -145,7 +144,7 @@ ggplot(BMI_Prop, aes(x=BMI, y=propDiabetes)) +
 
 
 ```{r}
-
+saveRDS(diab2, file = "diab2.rds")
 ```
 
 

@@ -10,15 +10,17 @@ library(ggplot2)
 library(caret)
 library(ranger)
 library(Metrics)
+
+diabmodel <- readRDS("diab2.rds")
 ```
 
 > Partition the data set into training & test sets
 
 ```{r}
 set.seed(90)
-trainIndex <- createDataPartition(diab2$DiabetesStatus, p = 0.7, list = FALSE)
-diabTrain <- diab2[trainIndex, ]
-diabTest <- diab2[-trainIndex, ]
+trainIndex <- createDataPartition(diabmodel$DiabetesStatus, p = 0.7, list = FALSE)
+diabTrain <- diabmodel[trainIndex, ]
+diabTest <- diabmodel[-trainIndex, ]
 ```
 
 > Begin modeling:
@@ -69,12 +71,14 @@ set.seed(56)
 ### Classification Tree
 
 ```{r}
-(treeFit1 <- train(DiabetesStatus ~ BMI*GenHlth,
-                  data = diab2,
+(treeFit1 <- train(DiabetesStatus ~
+BMI*GenHlth*Smoker*Education*Income*Age*PhysActivity,
+                  data = diabmodel,
                   method = "rpart",
                   trControl=trctrl,
                   preProcess = c("center", "scale"),
-                  tuneGrid = data.frame(cp = seq(0, 0.1, by = 0.01)),
+                  tuneGrid = data.frame(cp = seq(0, 0.1,
+                                                 by = 0.001)),
                   metric = "logLoss"))
 ```
 
@@ -82,12 +86,16 @@ set.seed(56)
 
 ```{r}
 (treeFit2 <- train(DiabetesStatus ~ .,
-                  data = diab2,
+                  data = diabmodel,
                   method = "ranger",
+                  tuneGrid = expand.grid(
+                    mtry = 2,
+                    splitrule = "extratrees",
+                    min.node.size=100),
                   trControl=trctrl,
                   preProcess = c("center", "scale"),
                   metric = "logLoss",
-                  tuneLength = 3))
+                  num.trees = 100))
 ```
 
 > Using this random forest method and the 'ranger' package which randomly select supporting parameters, the value of 'mtry' for a random forest model which minimizes logLoss value is mtry = 2.
@@ -108,17 +116,17 @@ set.seed(56)
 ```
 
 ```{r, warning=FALSE}
-(logLoss(diabetes$Diabetes_binary, glmpred$Yes))
+(logLoss(diabmodel$Diabetes_binary, glmpred$Yes))
 ```
 
 #### Classification Tree Prediction
 
 ```{r}
-(ctpred <- predict(treeFit1, diabTest, type = "prob"))
+(ctpred <- predict(treeFit1, diabTest, type = "prob", cp = 0.001))
 ```
 
 ```{r, warning=FALSE}
-(logLoss(diabetes$Diabetes_binary, ctpred$Yes))
+(logLoss(diabmodel$Diabetes_binary, ctpred$Yes))
 ```
 
 #### Random Forest Prediction
@@ -128,7 +136,7 @@ set.seed(56)
 ```
 
 ```{r, warning=FALSE}
-logLoss(diabetes$Diabetes_binary, rfpred$Yes)
+logLoss(diabmodel$Diabetes_binary, rfpred$Yes)
 ```
 
 ### Model Selection
@@ -138,7 +146,7 @@ logLoss(diabetes$Diabetes_binary, rfpred$Yes)
 |          Model        |   logLoss   |
 |----------------------:|:-----------:|
 |     GLM (Age*BMI)     |   0.4492    |
-|  Classification Tree  |   0.4422    |
+|  Classification Tree  |   0.4576    |
 |     Random Forest     |   0.4833    |
 
 ### Link to EDA Site:
