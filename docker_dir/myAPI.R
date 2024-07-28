@@ -4,10 +4,10 @@ library(plumber)
 library(tidyverse)
 
 #Read in diabetes data
-diabapi <- read_csv("./diabetes_binary_health_indicators_BRFSS2015.csv")
+diabapi <- read_csv("diabetes_binary_health_indicators_BRFSS2015.csv")
 
 #Convert read-in dataframe such that Diabetes binary result is a class
-diabapi2 <- diabetes |>
+diabapi2 <- diabapi |>
   mutate(DiabetesStatus = 
            ifelse(Diabetes_binary == 0, "No",
                   ifelse(Diabetes_binary == 1, "Yes",
@@ -15,42 +15,33 @@ diabapi2 <- diabetes |>
   select(!Diabetes_binary)
 
 #Convert Diabetes Status to factor
-diab2$DiabetesStatus <- as.factor(diab2$DiabetesStatus)
+diabapi2$DiabetesStatus <- as.factor(diabapi2$DiabetesStatus)
 
 
-#Send a message
-#* @get /readme
-function(){
-  "This is our basic API"
-}
-
-#http://localhost:PORT/readme
-
-
-#Echo the parameter that was sent in
-#* @param msg The message to echo back.
-#* @get /echo
-function(msg=""){
-  list(msg = paste0("The message is: '", msg, "'"))
-}
-
-#http://localhost:PORT/echo?msg=Hey
-
-#Find natural log of a number
-#* @param BMI BMI category
+#Predict Diabetes Status based on classification tree model predictors
+#* @param BMI BMI value
 #* @param GenHlth General Health category
+#* @param Smoker Smoker status
+#* @param Education Education stratus
+#* @param Income Income stratus
+#* @param Age Observation Age
+#* @param PhysActivity Physical Active stratus
 #* @get /pred
-function(BMI = 25, GenHlth = 3){
-  log(as.numeric(num))
+function(BMI = 25, GenHlth = 3, Smoker = 1, Education = 4, Income = 5, Age = 8,
+         PhysActivity = 1) {
+  pred_df <- data.frame(BMI = BMI, GenHlth = GenHlth, Smoker = Smoker,
+                        Education = Education, Income = Income, Age = Age,
+                        PhysActivity = PhysActivity)
+  predict(treeFit1, newdata = pred_df)
 }
 
-#http://localhost:PORT/pred?BMI=40?GenHlth=4
+#http://localhost:PORT/pred?BMI=25&GenHlth=3&Smoker=1&Education=4&Income=5&Age=8&PhysActivity=1
 
 #Find multiple of two numbers
 #* @get /info
 function() {
-  "Charles Lane"
-  "url"
+  list(msg = "Charles Lane /
+       url")
 }
 
 #http://localhost:PORT/info

@@ -11,6 +11,7 @@ RUN R -e "install.packages('plumber')"
 RUN R -e "install.packages('tidyverse')"
 
 # copy everything from the current directory into the container
+COPY diabetes_binary_health_indicators_BRFSS2015.csv .
 COPY myAPI.R myAPI.R
 
 # open port to traffic

@@ -35,33 +35,35 @@ set.seed(56)
 
 ### Logistic Regression Models
 
-#### Age
+#### Age, BMI, HighBP, HighChol
 > Starting with a model only dependent upon age
 
 ```{r}
-(glmFit1 <- train(DiabetesStatus ~ Age,
+(glmFit1 <- train(DiabetesStatus ~ Age*BMI*HighBP*HighChol,
                  data = diabTrain,
                  method = "glm",
                  metric = "logLoss",
                  trControl=trctrl))
 ```
 
-#### Age & BMI
+#### Age, BMI, Education, Income, Physical Activity, Smoker
 > Next use a model incorporating age & BMI, with interaction effects:
 
 ```{r}
-(glmFit2 <- train(DiabetesStatus ~ Age*BMI,
+(glmFit2 <- train(DiabetesStatus ~
+                    Age*BMI*Education*Income*PhysActivity*Smoker,
                  data = diabTrain,
                  method = "glm",
                  metric = "logLoss",
                  trControl=trctrl))
 ```
 
-#### Education & Income
+#### Education, Income, High BP, High Cholesterol
 > Finally, a model incorporating Education, Income, and their interaction effects:
 
 ```{r}
-(glmFit3 <- train(DiabetesStatus ~ Education*Income,
+(glmFit3 <- train(DiabetesStatus ~
+                    Education*Income*HighBP*HighChol*Sex,
                  data = diabTrain,
                  method = "glm",
                  metric = "logLoss",
@@ -103,7 +105,7 @@ BMI*GenHlth*Smoker*Education*Income*Age*PhysActivity,
 ### Final Model Selection
 
 > Let's select the best model based on using the various training methodologies on the test set. The three models in question are the best results from the Logistic Regression, Classification Tree, and Random Forest models.
-> For Logistic Regression, the lowest logLoss function result was the formula analyzing Age, BMI, and their interaction effects.
+> For Logistic Regression, the lowest logLoss function result was the formula analyzing Age, BMI, High Blood Pressure, High Cholesterol, and their interaction effects.
 > For Classification Tree - with predictors of BMI, General Health, and their interaction effects, the lowest logLoss function result was associated with the cp (complexity parameter) of 0.
 > For The Random Forest, the lowest logLoss function result was associated with an mtry of 2.
 
@@ -112,7 +114,7 @@ BMI*GenHlth*Smoker*Education*Income*Age*PhysActivity,
 #### GLM Prediction
 
 ```{r}
-(glmpred <- predict(glmFit2, diabTest, type = "prob"))
+head(glmpred <- predict(glmFit1, diabTest, type = "prob"))
 ```
 
 ```{r, warning=FALSE}
@@ -122,7 +124,7 @@ BMI*GenHlth*Smoker*Education*Income*Age*PhysActivity,
 #### Classification Tree Prediction
 
 ```{r}
-(ctpred <- predict(treeFit1, diabTest, type = "prob", cp = 0.001))
+head(ctpred <- predict(treeFit1, diabTest, type = "prob", cp = 0.001))
 ```
 
 ```{r, warning=FALSE}
@@ -132,7 +134,7 @@ BMI*GenHlth*Smoker*Education*Income*Age*PhysActivity,
 #### Random Forest Prediction
 
 ```{r}
-(rfpred <- predict(treeFit2, diabTest, type = "prob"))
+head(rfpred <- predict(treeFit2, diabTest, type = "prob"))
 ```
 
 ```{r, warning=FALSE}
@@ -145,9 +147,43 @@ logLoss(diabmodel$Diabetes_binary, rfpred$Yes)
 
 |          Model        |   logLoss   |
 |----------------------:|:-----------:|
-|     GLM (Age*BMI)     |   0.4492    |
+|           GLM         |   0.4841    |
 |  Classification Tree  |   0.4576    |
-|     Random Forest     |   0.4833    |
+|     Random Forest     |   0.6739    |
+
+### Function for Prediction
+> Prior to populating the API file, I want to develop a function that will take in predictor values for arguments and produce a predicted value.
+
+```{r}
+#BMI*GenHlth*Smoker*Education*Income*Age*PhysActivity
+(predvec <- data.frame(BMI = 25, GenHlth = 3, Smoker = 1,
+                       Education = 3, Income = 4, Age = 9,
+                       PhysActivity = 0))
+```
+
+```{r}
+predict(treeFit1, newdata = predvec)
+```
+
+> Now, using the structure above, I'll develop a function building the newdata dataframe from the predictor variables specified.
+
+```{r}
+preddiab <- function(BMI = 25, GenHlth = 3, Smoker = 1,
+                     Education = 4, Income = 5, Age = 8,
+                     PhysActivity = 1) {
+  pred_df <- data.frame(BMI = BMI, GenHlth = GenHlth,
+                        Smoker = Smoker, Education = Education,
+                        Income = Income, Age = Age,
+                        PhysActivity = PhysActivity)
+  predict(treeFit1, newdata = pred_df)
+}
+```
+
+```{r}
+preddiab(50, 2, 0, 6, 8, 10, 0)
+```
+
+
 
 ### Link to EDA Site:
 
