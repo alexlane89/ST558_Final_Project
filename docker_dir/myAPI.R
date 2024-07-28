@@ -1,7 +1,8 @@
-#API.R 
+#myAPI.R 
 library(GGally)
 library(plumber)
 library(tidyverse)
+library(caret)
 
 #Read in diabetes data
 diabapi <- read_csv("diabetes_binary_health_indicators_BRFSS2015.csv")
@@ -17,6 +18,21 @@ diabapi2 <- diabapi |>
 #Convert Diabetes Status to factor
 diabapi2$DiabetesStatus <- as.factor(diabapi2$DiabetesStatus)
 
+#Create cross-validation training object
+trctrlapi <- trainControl(method = "cv", number = 5, classProbs = TRUE,
+                       summaryFunction = mnLogLoss)
+set.seed(56)
+
+#Generate the classification tree model
+treeFitapi <- train(DiabetesStatus ~
+                    BMI*GenHlth*Smoker*Education*Income*Age*PhysActivity,
+                  data = diabapi2,
+                  method = "rpart",
+                  trControl=trctrlapi,
+                  preProcess = c("center", "scale"),
+                  tuneGrid = data.frame(cp = seq(0, 0.1,
+                                                 by = 0.001)),
+                  metric = "logLoss")
 
 #Predict Diabetes Status based on classification tree model predictors
 #* @param BMI BMI value
@@ -32,7 +48,7 @@ function(BMI = 25, GenHlth = 3, Smoker = 1, Education = 4, Income = 5, Age = 8,
   pred_df <- data.frame(BMI = BMI, GenHlth = GenHlth, Smoker = Smoker,
                         Education = Education, Income = Income, Age = Age,
                         PhysActivity = PhysActivity)
-  predict(treeFit1, newdata = pred_df)
+  predict(treeFitapi, newdata = pred_df)
 }
 
 #http://localhost:PORT/pred?BMI=25&GenHlth=3&Smoker=1&Education=4&Income=5&Age=8&PhysActivity=1

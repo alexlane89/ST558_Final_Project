@@ -9,6 +9,7 @@ RUN apt-get update -qq && apt-get install -y  libssl-dev  libcurl4-gnutls-dev  l
 RUN R -e "install.packages('GGally')"
 RUN R -e "install.packages('plumber')"
 RUN R -e "install.packages('tidyverse')"
+RUN R -e "install.packages('caret')"
 
 # copy everything from the current directory into the container
 COPY diabetes_binary_health_indicators_BRFSS2015.csv .
