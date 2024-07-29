@@ -17,47 +17,42 @@ diabapi2 <- diabapi |>
 
 #Convert Diabetes Status to factor
 diabapi2$DiabetesStatus <- as.factor(diabapi2$DiabetesStatus)
+diabapi2$Age <- as.numeric(diabapi2$Age)
+diabapi2$Income <- as.numeric(diabapi2$Income)
 
 #Create cross-validation training object
 trctrlapi <- trainControl(method = "cv", number = 5, classProbs = TRUE,
                        summaryFunction = mnLogLoss)
 set.seed(56)
 
+
 #Generate the classification tree model
-treeFitapi <- train(DiabetesStatus ~
-                    BMI*GenHlth*Smoker*Education*Income*Age*PhysActivity,
+glmFitapi <- train(DiabetesStatus ~ Age*Income,
                   data = diabapi2,
-                  method = "rpart",
-                  trControl=trctrlapi,
-                  preProcess = c("center", "scale"),
-                  tuneGrid = data.frame(cp = seq(0, 0.1,
-                                                 by = 0.001)),
-                  metric = "logLoss")
+                  method = "glm",
+                  metric = "logLoss",
+                  trControl=trctrlapi)
 
 #Predict Diabetes Status based on classification tree model predictors
-#* @param BMI BMI value
-#* @param GenHlth General Health category
-#* @param Smoker Smoker status
-#* @param Education Education stratus
-#* @param Income Income stratus
 #* @param Age Observation Age
-#* @param PhysActivity Physical Active stratus
+#* @param Income Income stratus
 #* @get /pred
-function(BMI = 25, GenHlth = 3, Smoker = 1, Education = 4, Income = 5, Age = 8,
-         PhysActivity = 1) {
-  pred_df <- data.frame(BMI = BMI, GenHlth = GenHlth, Smoker = Smoker,
-                        Education = Education, Income = Income, Age = Age,
-                        PhysActivity = PhysActivity)
-  predict(treeFitapi, newdata = pred_df)
+function(Age, Income) {
+  pred_df <- data.frame(Age = as.numeric(Age),
+                        Income = as.numeric(Income))
+  predict(glmFitapi, newdata = pred_df, type = "prob")
 }
 
-#http://localhost:PORT/pred?BMI=25&GenHlth=3&Smoker=1&Education=4&Income=5&Age=8&PhysActivity=1
+#http://localhost:PORT/pred?Age=8&Income=5
+#http://localhost:PORT/pred?Age=12&Income=1
+#http://localhost:PORT/pred?Age=3&Income=4
 
-#Find multiple of two numbers
+
+#Reveal information
 #* @get /info
 function() {
   list(msg = "Charles Lane /
-       url")
+       https://alexlane89.github.io/ST558_Final_Project/")
 }
 
-#http://localhost:PORT/info
+#query with http://localhost:PORT/info

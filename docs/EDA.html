@@ -352,30 +352,30 @@ dbl (22): Diabetes_binary, HighBP, HighChol, CholCheck, BMI, Smoker, Stroke,...
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DiabetesStatus =</span> </span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>           <span class="fu">ifelse</span>(Diabetes_binary <span class="sc">==</span> <span class="dv">0</span>, <span class="st">"No"</span>,</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">ifelse</span>(Diabetes_binary <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Yes"</span>,</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"ERROR"</span>))) <span class="sc">|&gt;</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span>Diabetes_binary)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>diab2<span class="sc">$</span>DiabetesStatus <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(diab2<span class="sc">$</span>DiabetesStatus)</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>(diab2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"ERROR"</span>)))</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>diab2<span class="sc">$</span>DiabetesStatus <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(diab2<span class="sc">$</span>DiabetesStatus)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>(diab2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 253,680 × 22
-   HighBP HighChol CholCheck   BMI Smoker Stroke HeartDiseaseorAttack
-    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;                &lt;dbl&gt;
- 1      1        1         1    40      1      0                    0
- 2      0        0         0    25      1      0                    0
- 3      1        1         1    28      0      0                    0
- 4      1        0         1    27      0      0                    0
- 5      1        1         1    24      0      0                    0
- 6      1        1         1    25      1      0                    0
- 7      1        0         1    30      1      0                    0
- 8      1        1         1    25      1      0                    0
- 9      1        1         1    30      1      0                    1
-10      0        0         1    24      0      0                    0
+<pre><code># A tibble: 253,680 × 23
+   Diabetes_binary HighBP HighChol CholCheck   BMI Smoker Stroke
+             &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+ 1               0      1        1         1    40      1      0
+ 2               0      0        0         0    25      1      0
+ 3               0      1        1         1    28      0      0
+ 4               0      1        0         1    27      0      0
+ 5               0      1        1         1    24      0      0
+ 6               0      1        1         1    25      1      0
+ 7               0      1        0         1    30      1      0
+ 8               0      1        1         1    25      1      0
+ 9               1      1        1         1    30      1      0
+10               0      0        0         1    24      0      0
 # ℹ 253,670 more rows
-# ℹ 15 more variables: PhysActivity &lt;dbl&gt;, Fruits &lt;dbl&gt;, Veggies &lt;dbl&gt;,
-#   HvyAlcoholConsump &lt;dbl&gt;, AnyHealthcare &lt;dbl&gt;, NoDocbcCost &lt;dbl&gt;,
-#   GenHlth &lt;dbl&gt;, MentHlth &lt;dbl&gt;, PhysHlth &lt;dbl&gt;, DiffWalk &lt;dbl&gt;, Sex &lt;dbl&gt;,
-#   Age &lt;dbl&gt;, Education &lt;dbl&gt;, Income &lt;dbl&gt;, DiabetesStatus &lt;fct&gt;</code></pre>
+# ℹ 16 more variables: HeartDiseaseorAttack &lt;dbl&gt;, PhysActivity &lt;dbl&gt;,
+#   Fruits &lt;dbl&gt;, Veggies &lt;dbl&gt;, HvyAlcoholConsump &lt;dbl&gt;, AnyHealthcare &lt;dbl&gt;,
+#   NoDocbcCost &lt;dbl&gt;, GenHlth &lt;dbl&gt;, MentHlth &lt;dbl&gt;, PhysHlth &lt;dbl&gt;,
+#   DiffWalk &lt;dbl&gt;, Sex &lt;dbl&gt;, Age &lt;dbl&gt;, Education &lt;dbl&gt;, Income &lt;dbl&gt;,
+#   DiabetesStatus &lt;fct&gt;</code></pre>
 </div>
 </div>
 <blockquote class="blockquote">
@@ -395,7 +395,7 @@ dbl (22): Diabetes_binary, HighBP, HighChol, CholCheck, BMI, Smoker, Stroke,...
 <p>More plots</p>
 </blockquote>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>distSum <span class="ot">&lt;-</span> diabetes <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>distSum <span class="ot">&lt;-</span> diab2 <span class="sc">|&gt;</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Age) <span class="sc">|&gt;</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">propDiabetes =</span> <span class="fu">mean</span>(Diabetes_binary),</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
@@ -411,7 +411,7 @@ dbl (22): Diabetes_binary, HighBP, HighChol, CholCheck, BMI, Smoker, Stroke,...
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>Inc_Prop <span class="ot">&lt;-</span> diabetes <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>Inc_Prop <span class="ot">&lt;-</span> diab2 <span class="sc">|&gt;</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Income) <span class="sc">|&gt;</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">propDiabetes =</span> <span class="fu">mean</span>(Diabetes_binary),</span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
@@ -427,7 +427,7 @@ dbl (22): Diabetes_binary, HighBP, HighChol, CholCheck, BMI, Smoker, Stroke,...
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>Inc_Prop <span class="ot">&lt;-</span> diabetes <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>Inc_Prop <span class="ot">&lt;-</span> diab2 <span class="sc">|&gt;</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Education) <span class="sc">|&gt;</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">propDiabetes =</span> <span class="fu">mean</span>(Diabetes_binary),</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
@@ -443,7 +443,7 @@ dbl (22): Diabetes_binary, HighBP, HighChol, CholCheck, BMI, Smoker, Stroke,...
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>BMI_Prop <span class="ot">&lt;-</span> diabetes <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>BMI_Prop <span class="ot">&lt;-</span> diab2 <span class="sc">|&gt;</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(BMI) <span class="sc">|&gt;</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">propDiabetes =</span> <span class="fu">mean</span>(Diabetes_binary),</span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
@@ -457,6 +457,9 @@ dbl (22): Diabetes_binary, HighBP, HighChol, CholCheck, BMI, Smoker, Stroke,...
 </figure>
 </div>
 </div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(diab2, <span class="at">file =</span> <span class="st">"diab2.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="link-to-modeling-site" class="level3">

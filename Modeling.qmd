@@ -162,28 +162,51 @@ logLoss(diabmodel$Diabetes_binary, rfpred$Yes)
 ```
 
 ```{r}
-predict(treeFit1, newdata = predvec)
+predict(treeFit1, newdata = predvec, type = "prob")
 ```
 
 > Now, using the structure above, I'll develop a function building the newdata dataframe from the predictor variables specified.
 
 ```{r}
-preddiab <- function(BMI = 25, GenHlth = 3, Smoker = 1,
+predct <- function(BMI = 25, GenHlth = 3, Smoker = 1,
                      Education = 4, Income = 5, Age = 8,
                      PhysActivity = 1) {
   pred_df <- data.frame(BMI = BMI, GenHlth = GenHlth,
                         Smoker = Smoker, Education = Education,
                         Income = Income, Age = Age,
                         PhysActivity = PhysActivity)
-  predict(treeFit1, newdata = pred_df)
+  predict(treeFit1, newdata = pred_df, type = "prob")
 }
 ```
 
 ```{r}
-preddiab(50, 2, 0, 6, 8, 10, 0)
+predct(50, 2, 0, 6, 8, 10, 0)
 ```
 
+### Function for API Query
 
+> Unfortunately, the best model (by logLoss value) consumes quite a few resources, and generating the model in an API file, hosted by a docker container, caused the docker image to time out before the container became active/usable. To ensure the exercise can be completed through a docker-based API, I will use a simpler model: GLM with only 2 predictors: Age & Income.
+
+```{r}
+(glmFit4 <- train(DiabetesStatus ~ Age*Income,
+                  data = diabTrain,
+                  method = "glm",
+                  metric = "logLoss",
+                  trControl=trctrl))
+```
+
+```{r}
+#Function for simplified GLM model
+predglm <- function(Age = 8, Income = 5) {
+  pred_df <- data.frame(Age = as.numeric(Age),
+                        Income = as.numeric(Income))
+  predict(glmFit4, newdata = pred_df, type = "prob")
+}
+```
+
+```{r}
+predglm(Age = 11, Income = 2)
+```
 
 ### Link to EDA Site:
 
