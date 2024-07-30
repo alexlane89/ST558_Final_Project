@@ -18,7 +18,7 @@ diabapi2 <- diabapi |>
 #Convert Diabetes Status to factor
 diabapi2$DiabetesStatus <- as.factor(diabapi2$DiabetesStatus)
 diabapi2$Age <- as.numeric(diabapi2$Age)
-diabapi2$Income <- as.numeric(diabapi2$Income)
+diabapi2$BMI <- as.numeric(diabapi2$BMI)
 
 #Create cross-validation training object
 trctrlapi <- trainControl(method = "cv", number = 5, classProbs = TRUE,
@@ -27,25 +27,30 @@ set.seed(56)
 
 
 #Generate the classification tree model
-glmFitapi <- train(DiabetesStatus ~ Age*Income,
+glmFitapi <- train(DiabetesStatus ~ Age*BMI*HighBP*HighChol,
                   data = diabapi2,
                   method = "glm",
                   metric = "logLoss",
-                  trControl=trctrlapi)
+                  trControl=trctrlapi,
+                  family = "binomial")
 
-#Predict Diabetes Status based on classification tree model predictors
+#Predict Diabetes Status based on GLM model predictors
 #* @param Age Observation Age
-#* @param Income Income stratus
+#* @param BMI Body Mass Index
+#* @param HighBP High Blood Pressure
+#* @param HighChol High Cholesterol
 #* @get /pred
-function(Age, Income) {
+function(Age, BMI, HighBP, HighChol) {
   pred_df <- data.frame(Age = as.numeric(Age),
-                        Income = as.numeric(Income))
+                        BMI = as.numeric(BMI),
+                        HighBP = as.numeric(HighBP),
+                        HighChol = as.numeric(HighChol))
   predict(glmFitapi, newdata = pred_df, type = "prob")
 }
 
-#http://localhost:PORT/pred?Age=8&Income=5
-#http://localhost:PORT/pred?Age=12&Income=1
-#http://localhost:PORT/pred?Age=3&Income=4
+#http://localhost:8000/pred?Age=8&BMI=28&HighBP=0&HighChol=0
+#http://localhost:8000/pred?Age=11&BMI=50&HighBP=1&HighChol=1
+#http://localhost:8000/pred?Age=4&BMI=20&HighBP=1&HighChol=0
 
 
 #Reveal information

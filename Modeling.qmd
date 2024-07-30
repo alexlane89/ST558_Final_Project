@@ -2,7 +2,60 @@
 
 > This is the Modeling file which will be used to construct and evaluate different model fits for predictive modeling of Diabetes Health Indicators.
 
-> Start by activiting the necessary packages
+## Introduction to Data
+> The Behavioral Risk Factor Surveillance System (BRFSS) conducts yearly phone surveys in the United States. The surveys include questions for Americans about their health status and care choices. Our data set is a subset of the BRFSS survey calls from 2015 which focus on diabetes-related survey responses. Below is a brief description of each of the variables included in the data set.
+
+**Diabetes_binary:** The dependent variable. A 0/1 associated with No/Yes response to "have you been told you have diabetes (or prediabetes)?
+
+**HighBP:** Predictor indicating an individual has been told they have high blood pressure.
+
+**HighChol:** Predictor indicating an individual has been told they have high cholesterol.
+
+**CholCheck:** Cholesterol check has occurred within the past 5 years.
+
+**BMI:** Body Mass Index; calculated as a ratio of weight to height.
+
+**Smoker:** Response to question, "Have you smoked at least 100 cigarettes in your entire life?
+
+**Stroke:** Predictor indicating an individual has been told they experienced a stroke.
+
+**HeartDiseaseorAttack:** Individual has experienced heart disease or myocardial infarction.
+
+**PhysActivity:** Respondent has engaged in physical activity in the past 30 days.
+
+**Fruits:** Respondent consumes fruit once or more per day.
+
+**Veggies:** Respondent consumes vegetables once or more per day.
+
+**HvyAlcoholConsump:** More than 14 drinks per week for men & more than 7 drinks per week for women.
+
+**AnyHealthcare:** Respondent has some kind of healtch coverage.
+
+**NoDocbcCost:** Response to the question, "Was there a time in the past 12 months when you needed to see a doctor but could not because of cost?"
+
+**GenHlth:** General scale (1-5) assessment of health
+
+**MentHlth:** Response to the question, "How many days during the past 30 was your mental health not good?"
+
+**PhysHlth:** Response to the question, "How many days during the past 30 was your physical health not good?"
+
+**DiffWalk:** Response to the question, "Do you have serious difficulty walking or climbing stairs?"
+
+**Sex:** Sex identification 0/1::female/male
+
+**Age:** 13-level age category starting at 18 (i.e. level 1 is 18-24)
+
+**Education:** Education scale 1-6
+> 1: Never attended school or only kindergarten
+> 2: Grades 1-8 (elementary)
+> 3: Grades 9-11 (some high school)
+> 4: Grade 12 or GED (High school graduate)
+> 5: College 1 to 3 years (some college)
+> 6: College 4 years or more (college graduate)
+
+**Income:** Income scale 1-8, ranging from 1 = less than 10,000 to 8 = 75,000 or more.
+
+> I'll start by activiting the necessary packages and reading in the requisite data set identified/explored previously (see link to EDA quarto document at bottom of page).
 
 ```{r, warning=FALSE, message=FALSE}
 library(tidyverse)
@@ -14,7 +67,7 @@ library(Metrics)
 diabmodel <- readRDS("diab2.rds")
 ```
 
-> Partition the data set into training & test sets
+> My first step in generating models for prediction of diabetes incidence, I need to partition the data set into training & test sets. This includes setting a seed value such that the results can be reproducible.
 
 ```{r}
 set.seed(90)
@@ -23,9 +76,7 @@ diabTrain <- diabmodel[trainIndex, ]
 diabTest <- diabmodel[-trainIndex, ]
 ```
 
-> Begin modeling:
-
-> Create the training object
+> A training object will be created to support the subsequent training activities. This training method uses cross-validation with 5 subsets and uses the logLoss function to evaluate model effectiveness.
 
 ```{r}
 trctrl <- trainControl(method = "cv", number = 5, classProbs = TRUE,
@@ -35,19 +86,23 @@ set.seed(56)
 
 ### Logistic Regression Models
 
+> Three Generalized Linear Models (GLMs) will be evaluated with different combinations of predictors. A GLM is used when the response / dependent variable cannot be predicted via simply ordinary linear regression. In this case, we are evaluating a binary response, so a GLM is appropriate.
+
 #### Age, BMI, HighBP, HighChol
-> Starting with a model only dependent upon age
+
+> Starting out with an evaluation of Age, BMI, High Blood Pressure, and High Cholesterol, along with their interaction effects.
 
 ```{r}
 (glmFit1 <- train(DiabetesStatus ~ Age*BMI*HighBP*HighChol,
                  data = diabTrain,
                  method = "glm",
                  metric = "logLoss",
-                 trControl=trctrl))
+                 trControl=trctrl,
+                 family = "binomial"))
 ```
 
 #### Age, BMI, Education, Income, Physical Activity, Smoker
-> Next use a model incorporating age & BMI, with interaction effects:
+> Next use a model incorporating Age, BMI, Education, Income, Physical Activity, Smoker status, and their interaction effects.
 
 ```{r}
 (glmFit2 <- train(DiabetesStatus ~
@@ -55,11 +110,12 @@ set.seed(56)
                  data = diabTrain,
                  method = "glm",
                  metric = "logLoss",
-                 trControl=trctrl))
+                 trControl=trctrl,
+                 family = "binomial"))
 ```
 
 #### Education, Income, High BP, High Cholesterol
-> Finally, a model incorporating Education, Income, and their interaction effects:
+> Finally, a model incorporating Education, Income, High Blood Pressure, High Cholesterol, Sex, and their interaction effects:
 
 ```{r}
 (glmFit3 <- train(DiabetesStatus ~
@@ -67,14 +123,19 @@ set.seed(56)
                  data = diabTrain,
                  method = "glm",
                  metric = "logLoss",
-                 trControl=trctrl))
+                 trControl=trctrl,
+                 family = "binomial"))
 ```
+
+> Evaluating the lowest logLoss function result from the 3 models above identifies the best GLM model. For my purposes, the best model of the 3 was the first fit, which analyzed Age, BMI, High Blood Pressure, High Cholesterol, and their interaction effects.
 
 ### Classification Tree
 
+> The next model type I'll explore is a classification tree. This model creates splits for each variable and generates a "tree" based on the various splits, and subsequent splits of data values (or between factors). Unlike the GLM models, where I would generate difference models with different predictors, classification trees have tuning parameters. The training activity below is used to determine the best tuning parameter ("cp") value to use for the model.
+
 ```{r}
 (treeFit1 <- train(DiabetesStatus ~
-BMI*GenHlth*Smoker*Education*Income*Age*PhysActivity,
+BMI+GenHlth+Smoker+Education+Income+Age+PhysActivity,
                   data = diabmodel,
                   method = "rpart",
                   trControl=trctrl,
@@ -84,7 +145,11 @@ BMI*GenHlth*Smoker*Education*Income*Age*PhysActivity,
                   metric = "logLoss"))
 ```
 
+> With a logLoss of ~0.356, the best tuning parameter value is cp = 0.
+
 ### Random Forest
+
+> Random Forest is an ensemble learning method which generates many different classification trees. For binomial responses like our data set, the output is determined by identifying the most prevalent outcome from all the different classification trees generated during the model training.
 
 ```{r}
 (treeFit2 <- train(DiabetesStatus ~ .,
@@ -106,10 +171,10 @@ BMI*GenHlth*Smoker*Education*Income*Age*PhysActivity,
 
 > Let's select the best model based on using the various training methodologies on the test set. The three models in question are the best results from the Logistic Regression, Classification Tree, and Random Forest models.
 > For Logistic Regression, the lowest logLoss function result was the formula analyzing Age, BMI, High Blood Pressure, High Cholesterol, and their interaction effects.
-> For Classification Tree - with predictors of BMI, General Health, and their interaction effects, the lowest logLoss function result was associated with the cp (complexity parameter) of 0.
-> For The Random Forest, the lowest logLoss function result was associated with an mtry of 2.
+> For Classification Tree - with predictors of Age, BMI, High Blood Pressure, High Cholesterol, Smoker, Education, Income, Age, and Physical Activity., the lowest logLoss function result was associated with the cp (complexity parameter) of 0.001.
+> For The Random Forest, the lowest logLoss function result was associated with an all predictors included and an mtry of 2.
 
-> First, we need to predict values using each model on the test set
+> To compare the models further, we need to predict values using each model on the test set
 
 #### GLM Prediction
 

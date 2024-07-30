@@ -3,33 +3,68 @@
 > This is the initial Exploratory Data Analysis file which will examine the Diabetes Health Indicators data set.
 
 ## Introduction to Data
-> The Behavioral Risk Factor Surveillance System (BRFSS) conducts yearly phone surveys in the United States. The surveys include questions for Americans about their health status and care choices. Our data set is a subset of the BRFSS survey calls from 2015 which focus on diabetes-related survey responses.
+> The Behavioral Risk Factor Surveillance System (BRFSS) conducts yearly phone surveys in the United States. The surveys include questions for Americans about their health status and care choices. Our data set is a subset of the BRFSS survey calls from 2015 which focus on diabetes-related survey responses. Below is a brief description of each of the variables included in the data set.
 
-| Diabetes_binary | HighBP | HighChol | CholCheck | BMI | Smoker | Stroke |
-|-----------------|:-------|---------:|:----------|----:|:-------|-------:|
-|      Class      | Class  |   Class  |   Class   | Num | Class  |  Class |
-|        0        |   0    |     0    |     0     |     |   0    |    0   |
-|        1        |   1    |     1    |     1     |     |   1    |    1   |
+**Diabetes_binary:** The dependent variable. A 0/1 associated with No/Yes response to "have you been told you have diabetes (or prediabetes)?
 
-| HeartDiseaseorAngina | PhysActivty | Fruits |
-|----------------------|:------------|-------:|
-|         Class        |    Class    | Class  |
-|           0          |      0      |   0    |
-|           1          |      1      |   1    |
+**HighBP:** Predictor indicating an individual has been told they have high blood pressure.
 
-: Diabetes Survey Response variables - columns and their type.
+**HighChol:** Predictor indicating an individual has been told they have high cholesterol.
+
+**CholCheck:** Cholesterol check has occurred within the past 5 years.
+
+**BMI:** Body Mass Index; calculated as a ratio of weight to height.
+
+**Smoker:** Response to question, "Have you smoked at least 100 cigarettes in your entire life?
+
+**Stroke:** Predictor indicating an individual has been told they experienced a stroke.
+
+**HeartDiseaseorAttack:** Individual has experienced heart disease or myocardial infarction.
+
+**PhysActivity:** Respondent has engaged in physical activity in the past 30 days.
+
+**Fruits:** Respondent consumes fruit once or more per day.
+
+**Veggies:** Respondent consumes vegetables once or more per day.
+
+**HvyAlcoholConsump:** More than 14 drinks per week for men & more than 7 drinks per week for women.
+
+**AnyHealthcare:** Respondent has some kind of healtch coverage.
+
+**NoDocbcCost:** Response to the question, "Was there a time in the past 12 months when you needed to see a doctor but could not because of cost?"
+
+**GenHlth:** General scale (1-5) assessment of health
+
+**MentHlth:** Response to the question, "How many days during the past 30 was your mental health not good?"
+
+**PhysHlth:** Response to the question, "How many days during the past 30 was your physical health not good?"
+
+**DiffWalk:** Response to the question, "Do you have serious difficulty walking or climbing stairs?"
+
+**Sex:** Sex identification 0/1::female/male
+
+**Age:** 13-level age category starting at 18 (i.e. level 1 is 18-24)
+
+**Education:** Education scale 1-6
+> 1: Never attended school or only kindergarten
+> 2: Grades 1-8 (elementary)
+> 3: Grades 9-11 (some high school)
+> 4: Grade 12 or GED (High school graduate)
+> 5: College 1 to 3 years (some college)
+> 6: College 4 years or more (college graduate)
+
+**Income:** Income scale 1-8, ranging from 1 = less than 10,000 to 8 = 75,000 or more.
 
 ### Exploratory Discussion
 
-> Start by activiting the necessary packages
+> I will begin my data exploration by activiting the necessary packages
 
 ```{r, warning=FALSE, message=FALSE}
 library(tidyverse)
 library(ggplot2)
 ```
 
-
-> Insert comments on which predictors 
+> We will read in the data to a dataframe object, and purposefully identify the data type for each of the 22 variables.
 
 ```{r}
 diabetes <- read_csv("diabetes_binary_health_indicators_BRFSS2015.csv")
@@ -37,17 +72,9 @@ diabetes <- read_csv("diabetes_binary_health_indicators_BRFSS2015.csv")
 spec(diabetes)
 ```
 
-#### Variable Descriptions
+> All data types are "doubles", but for some analyses, we may need to convert the dependent variable "Diabetes_binary" to a factor.
 
-> The output above lists all the variables/columns associated with the BRFSS binary indicators dataset from 2015. See below for an explanation of the variables in question:
-
-**Diabetes_binary**: An assessment of diabetes status of the individual respondent with 3 levels:
-
-|         0       |      1       |     2    |
-|:---------------:|:------------:|:--------:|
-|   No Diabetes   | Pre-Diabetes | Diabetes |
-
-> Clean up data - identify NA'ed rows. I would like to identify if there are any columns with NA values.
+> Clean up data - before data manipulation (i.e. converting Diabetes_binary to a factor), I would like to identify if any rows include N/A values.
 
 ```{r}
 NA_vec <- c(seq_along(diabetes))
@@ -67,20 +94,20 @@ NA_vec
 ```{r}
 b <- ggplot(data = diabetes, aes(x=BMI))
 b + geom_histogram(binwidth = 5) +
-  labs(title = "BMI Histogram")
+  labs(title = "BMI Histogram") +
+  geom_vline(aes(xintercept = mean(BMI)),col='black',size=2)
 ```
 
-> Summary Statistics for BMI:
+> Given the number of class variables (especially binary), in the data set, determining the mean value for each column will give a proportional insight to each variable. For example, ~14% of the observations are either diabetic or prediabetic, while only ~4% of the respondents had experienced a stroke, and ~44% were considered smokers.
 
 ```{r}
-summary(diabetes$BMI)
+(sum_stats <- data.frame(lapply(diabetes, FUN = mean)))
 ```
 
-> The maximum identification of 98 is helpful for this exercise, because it's difficult to see the outlier values from the histogram.
 
 ### Data Manipulation
 
-> To support the model development, I will convert the target variable: Diabetes_binary to a factor column with status of "No", "Pre", "Diabetes"
+> To support the model development, I will convert the target variable: Diabetes_binary to a factor column with status of "No" and "Yes". Yes indicates someone who is either prediabetic or diabetic.
 
 ```{r}
 diab2 <- diabetes |>
@@ -90,17 +117,10 @@ diab2 <- diabetes |>
                          "ERROR")))
 diab2$DiabetesStatus <- as.factor(diab2$DiabetesStatus)
 
-(diab2)
+head(diab2)
 ```
 
-
-> Viewing combination of variables
-
-```{r}
-pairs(~ Age + Education + Income, data = diab2)
-```
-
-> More plots
+> It can be somewhat difficult to visualize class variables. For several of the variables in the data set, I will plot the proportion of Diabetes incidence against each factor level, including sizing of each plot point based on the count of factor level occurrences. Plots were generated for Age, Income, and Education class variables.
 
 ```{r}
 distSum <- diab2 |>
@@ -109,7 +129,8 @@ distSum <- diab2 |>
             n = n()) |>
   ungroup()
 ggplot(distSum, aes(x=Age, y=propDiabetes)) +
-  geom_point(stat = "identity", aes(size = n))
+  geom_point(stat = "identity", aes(size = n)) +
+  labs(title = "Proportion of Individuals w/Diabetes per Age Group")
 ```
 
 ```{r}
@@ -119,7 +140,8 @@ Inc_Prop <- diab2 |>
             n = n()) |>
   ungroup()
 ggplot(Inc_Prop, aes(x=Income, y=propDiabetes)) +
-  geom_point(stat = "identity", aes(size = n))
+  geom_point(stat = "identity", aes(size = n)) +
+  labs(title = "Proportion of Individuals w/Diabetes per Income Level")
 ```
 
 ```{r}
@@ -129,8 +151,11 @@ Inc_Prop <- diab2 |>
             n = n()) |>
   ungroup()
 ggplot(Inc_Prop, aes(x=Education, y=propDiabetes)) +
-  geom_point(stat = "identity", aes(size = n))
+  geom_point(stat = "identity", aes(size = n)) +
+  labs(title = "Proportion of Individuals w/Diabetes per Education Level")
 ```
+
+> Using a similar approach as above, a scatterplot-like graph is generated to evaluate BMI against diabetes incidence proportion. As with the plots above, the goal is to identify visually if there is a possible relationship between several class variables and the proportion of affirmative diabetes responses prior to generating fit models for the data set.
 
 ```{r}
 BMI_Prop <- diab2 |>
@@ -142,6 +167,7 @@ ggplot(BMI_Prop, aes(x=BMI, y=propDiabetes)) +
   geom_point(stat = "identity", aes(size = n))
 ```
 
+> Prior to beginning the modeling activities for this data set, I'll save the manipulated diabetes dataset such that it can be read-in for modeling.
 
 ```{r}
 saveRDS(diab2, file = "diab2.rds")
