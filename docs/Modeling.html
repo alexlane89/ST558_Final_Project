@@ -122,8 +122,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <p>This is the Modeling file which will be used to construct and evaluate different model fits for predictive modeling of Diabetes Health Indicators.</p>
 </blockquote>
+<section id="introduction-to-data" class="level2">
+<h2 class="anchored" data-anchor-id="introduction-to-data">Introduction to Data</h2>
 <blockquote class="blockquote">
-<p>Start by activiting the necessary packages</p>
+<p>The Behavioral Risk Factor Surveillance System (BRFSS) conducts yearly phone surveys in the United States. The surveys include questions for Americans about their health status and care choices. Our data set is a subset of the BRFSS survey calls from 2015 which focus on diabetes-related survey responses. Below is a brief description of each of the variables included in the data set.</p>
+</blockquote>
+<p><strong>Diabetes_binary:</strong> The dependent variable. A 0/1 associated with No/Yes response to “have you been told you have diabetes (or prediabetes)?</p>
+<p><strong>HighBP:</strong> Predictor indicating an individual has been told they have high blood pressure.</p>
+<p><strong>HighChol:</strong> Predictor indicating an individual has been told they have high cholesterol.</p>
+<p><strong>CholCheck:</strong> Cholesterol check has occurred within the past 5 years.</p>
+<p><strong>BMI:</strong> Body Mass Index; calculated as a ratio of weight to height.</p>
+<p><strong>Smoker:</strong> Response to question, “Have you smoked at least 100 cigarettes in your entire life?</p>
+<p><strong>Stroke:</strong> Predictor indicating an individual has been told they experienced a stroke.</p>
+<p><strong>HeartDiseaseorAttack:</strong> Individual has experienced heart disease or myocardial infarction.</p>
+<p><strong>PhysActivity:</strong> Respondent has engaged in physical activity in the past 30 days.</p>
+<p><strong>Fruits:</strong> Respondent consumes fruit once or more per day.</p>
+<p><strong>Veggies:</strong> Respondent consumes vegetables once or more per day.</p>
+<p><strong>HvyAlcoholConsump:</strong> More than 14 drinks per week for men &amp; more than 7 drinks per week for women.</p>
+<p><strong>AnyHealthcare:</strong> Respondent has some kind of healtch coverage.</p>
+<p><strong>NoDocbcCost:</strong> Response to the question, “Was there a time in the past 12 months when you needed to see a doctor but could not because of cost?”</p>
+<p><strong>GenHlth:</strong> General scale (1-5) assessment of health</p>
+<p><strong>MentHlth:</strong> Response to the question, “How many days during the past 30 was your mental health not good?”</p>
+<p><strong>PhysHlth:</strong> Response to the question, “How many days during the past 30 was your physical health not good?”</p>
+<p><strong>DiffWalk:</strong> Response to the question, “Do you have serious difficulty walking or climbing stairs?”</p>
+<p><strong>Sex:</strong> Sex identification 0/1::female/male</p>
+<p><strong>Age:</strong> 13-level age category starting at 18 (i.e.&nbsp;level 1 is 18-24)</p>
+<p><strong>Education:</strong> Education scale 1-6 &gt; 1: Never attended school or only kindergarten &gt; 2: Grades 1-8 (elementary) &gt; 3: Grades 9-11 (some high school) &gt; 4: Grade 12 or GED (High school graduate) &gt; 5: College 1 to 3 years (some college) &gt; 6: College 4 years or more (college graduate)</p>
+<p><strong>Income:</strong> Income scale 1-8, ranging from 1 = less than 10,000 to 8 = 75,000 or more.</p>
+<blockquote class="blockquote">
+<p>I’ll start by activiting the necessary packages and reading in the requisite data set identified/explored previously (see link to EDA quarto document at bottom of page).</p>
 </blockquote>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
@@ -135,7 +162,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>diabmodel <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"diab2.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
-<p>Partition the data set into training &amp; test sets</p>
+<p>My first step in generating models for prediction of diabetes incidence, I need to partition the data set into training &amp; test sets. This includes setting a seed value such that the results can be reproducible.</p>
 </blockquote>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">90</span>)</span>
@@ -144,10 +171,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>diabTest <span class="ot">&lt;-</span> diabmodel[<span class="sc">-</span>trainIndex, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
-<p>Begin modeling:</p>
-</blockquote>
-<blockquote class="blockquote">
-<p>Create the training object</p>
+<p>A training object will be created to support the subsequent training activities. This training method uses cross-validation with 5 subsets and uses the logLoss function to evaluate model effectiveness.</p>
 </blockquote>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>trctrl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">number =</span> <span class="dv">5</span>, <span class="at">classProbs =</span> <span class="cn">TRUE</span>,</span>
@@ -156,17 +180,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="logistic-regression-models" class="level3">
 <h3 class="anchored" data-anchor-id="logistic-regression-models">Logistic Regression Models</h3>
+<blockquote class="blockquote">
+<p>Three Generalized Linear Models (GLMs) will be evaluated with different combinations of predictors. A GLM is used when the response / dependent variable cannot be predicted via simply ordinary linear regression. In this case, we are evaluating a binary response, so a GLM is appropriate.</p>
+</blockquote>
 <section id="age-bmi-highbp-highchol" class="level4">
 <h4 class="anchored" data-anchor-id="age-bmi-highbp-highchol">Age, BMI, HighBP, HighChol</h4>
 <blockquote class="blockquote">
-<p>Starting with a model only dependent upon age</p>
+<p>Starting out with an evaluation of Age, BMI, High Blood Pressure, and High Cholesterol, along with their interaction effects.</p>
 </blockquote>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>(glmFit1 <span class="ot">&lt;-</span> <span class="fu">train</span>(DiabetesStatus <span class="sc">~</span> Age<span class="sc">*</span>BMI<span class="sc">*</span>HighBP<span class="sc">*</span>HighChol,</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> diabTrain,</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">method =</span> <span class="st">"glm"</span>,</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">metric =</span> <span class="st">"logLoss"</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">trControl=</span>trctrl))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">trControl=</span>trctrl,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">family =</span> <span class="st">"binomial"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Generalized Linear Model 
 
@@ -187,7 +215,7 @@ Resampling results:
 <section id="age-bmi-education-income-physical-activity-smoker" class="level4">
 <h4 class="anchored" data-anchor-id="age-bmi-education-income-physical-activity-smoker">Age, BMI, Education, Income, Physical Activity, Smoker</h4>
 <blockquote class="blockquote">
-<p>Next use a model incorporating age &amp; BMI, with interaction effects:</p>
+<p>Next use a model incorporating Age, BMI, Education, Income, Physical Activity, Smoker status, and their interaction effects.</p>
 </blockquote>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>(glmFit2 <span class="ot">&lt;-</span> <span class="fu">train</span>(DiabetesStatus <span class="sc">~</span></span>
@@ -195,7 +223,8 @@ Resampling results:
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> diabTrain,</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">method =</span> <span class="st">"glm"</span>,</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">metric =</span> <span class="st">"logLoss"</span>,</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">trControl=</span>trctrl))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">trControl=</span>trctrl,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">family =</span> <span class="st">"binomial"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Generalized Linear Model 
 
@@ -216,7 +245,7 @@ Resampling results:
 <section id="education-income-high-bp-high-cholesterol" class="level4">
 <h4 class="anchored" data-anchor-id="education-income-high-bp-high-cholesterol">Education, Income, High BP, High Cholesterol</h4>
 <blockquote class="blockquote">
-<p>Finally, a model incorporating Education, Income, and their interaction effects:</p>
+<p>Finally, a model incorporating Education, Income, High Blood Pressure, High Cholesterol, Sex, and their interaction effects:</p>
 </blockquote>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(glmFit3 <span class="ot">&lt;-</span> <span class="fu">train</span>(DiabetesStatus <span class="sc">~</span></span>
@@ -224,7 +253,8 @@ Resampling results:
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> diabTrain,</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">method =</span> <span class="st">"glm"</span>,</span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">metric =</span> <span class="st">"logLoss"</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">trControl=</span>trctrl))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">trControl=</span>trctrl,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">family =</span> <span class="st">"binomial"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Generalized Linear Model 
 
@@ -241,13 +271,19 @@ Resampling results:
   0.3515092</code></pre>
 </div>
 </div>
+<blockquote class="blockquote">
+<p>Evaluating the lowest logLoss function result from the 3 models above identifies the best GLM model. For my purposes, the best model of the 3 was the first fit, which analyzed Age, BMI, High Blood Pressure, High Cholesterol, and their interaction effects.</p>
+</blockquote>
 </section>
 </section>
 <section id="classification-tree" class="level3">
 <h3 class="anchored" data-anchor-id="classification-tree">Classification Tree</h3>
+<blockquote class="blockquote">
+<p>The next model type I’ll explore is a classification tree. This model creates splits for each variable and generates a “tree” based on the various splits, and subsequent splits of data values (or between factors). Unlike the GLM models, where I would generate difference models with different predictors, classification trees have tuning parameters. The training activity below is used to determine the best tuning parameter (“cp”) value to use for the model.</p>
+</blockquote>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>(treeFit1 <span class="ot">&lt;-</span> <span class="fu">train</span>(DiabetesStatus <span class="sc">~</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>BMI<span class="sc">*</span>GenHlth<span class="sc">*</span>Smoker<span class="sc">*</span>Education<span class="sc">*</span>Income<span class="sc">*</span>Age<span class="sc">*</span>PhysActivity,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>BMI<span class="sc">+</span>GenHlth<span class="sc">+</span>Smoker<span class="sc">+</span>Education<span class="sc">+</span>Income<span class="sc">+</span>Age<span class="sc">+</span>PhysActivity,</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> diabmodel,</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">method =</span> <span class="st">"rpart"</span>,</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">trControl=</span>trctrl,</span>
@@ -262,17 +298,17 @@ Resampling results:
      7 predictor
      2 classes: 'No', 'Yes' 
 
-Pre-processing: centered (127), scaled (127) 
+Pre-processing: centered (7), scaled (7) 
 Resampling: Cross-Validated (5 fold) 
 Summary of sample sizes: 202944, 202944, 202943, 202945, 202944 
 Resampling results across tuning parameters:
 
   cp     logLoss  
-  0.000  0.4829028
-  0.001  0.3496636
-  0.002  0.3496728
-  0.003  0.3714866
-  0.004  0.3929922
+  0.000  0.3605379
+  0.001  0.3570110
+  0.002  0.3571636
+  0.003  0.4037509
+  0.004  0.4037509
   0.005  0.4037509
   0.006  0.4037509
   0.007  0.4037509
@@ -374,9 +410,15 @@ logLoss was used to select the optimal model using the smallest value.
 The final value used for the model was cp = 0.001.</code></pre>
 </div>
 </div>
+<blockquote class="blockquote">
+<p>With a logLoss of ~0.356, the best tuning parameter value is cp = 0.</p>
+</blockquote>
 </section>
 <section id="random-forest" class="level3">
 <h3 class="anchored" data-anchor-id="random-forest">Random Forest</h3>
+<blockquote class="blockquote">
+<p>Random Forest is an ensemble learning method which generates many different classification trees. For binomial responses like our data set, the output is determined by identifying the most prevalent outcome from all the different classification trees generated during the model training.</p>
+</blockquote>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>(treeFit2 <span class="ot">&lt;-</span> <span class="fu">train</span>(DiabetesStatus <span class="sc">~</span> .,</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> diabmodel,</span>
@@ -418,10 +460,10 @@ Tuning parameter 'min.node.size' was held constant at a value of 100</code></pre
 <section id="final-model-selection" class="level3">
 <h3 class="anchored" data-anchor-id="final-model-selection">Final Model Selection</h3>
 <blockquote class="blockquote">
-<p>Let’s select the best model based on using the various training methodologies on the test set. The three models in question are the best results from the Logistic Regression, Classification Tree, and Random Forest models. For Logistic Regression, the lowest logLoss function result was the formula analyzing Age, BMI, High Blood Pressure, High Cholesterol, and their interaction effects. For Classification Tree - with predictors of BMI, General Health, and their interaction effects, the lowest logLoss function result was associated with the cp (complexity parameter) of 0. For The Random Forest, the lowest logLoss function result was associated with an mtry of 2.</p>
+<p>Let’s select the best model based on using the various training methodologies on the test set. The three models in question are the best results from the Logistic Regression, Classification Tree, and Random Forest models. For Logistic Regression, the lowest logLoss function result was the formula analyzing Age, BMI, High Blood Pressure, High Cholesterol, and their interaction effects. For Classification Tree - with predictors of Age, BMI, High Blood Pressure, High Cholesterol, Smoker, Education, Income, Age, and Physical Activity., the lowest logLoss function result was associated with the cp (complexity parameter) of 0.001. For The Random Forest, the lowest logLoss function result was associated with an all predictors included and an mtry of 2.</p>
 </blockquote>
 <blockquote class="blockquote">
-<p>First, we need to predict values using each model on the test set</p>
+<p>To compare the models further, we need to predict values using each model on the test set</p>
 </blockquote>
 <section id="glm-prediction" class="level4">
 <h4 class="anchored" data-anchor-id="glm-prediction">GLM Prediction</h4>
@@ -449,19 +491,19 @@ Tuning parameter 'min.node.size' was held constant at a value of 100</code></pre
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ctpred <span class="ot">&lt;-</span> <span class="fu">predict</span>(treeFit1, diabTest, <span class="at">type =</span> <span class="st">"prob"</span>, <span class="at">cp =</span> <span class="fl">0.001</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>         No        Yes
-1 0.4286344 0.57136564
-2 0.5613505 0.43864953
-3 0.7515312 0.24846878
-4 0.7515312 0.24846878
-5 0.9363272 0.06367278
-6 0.9363272 0.06367278</code></pre>
+<pre><code>         No       Yes
+1 0.3927025 0.6072975
+2 0.8193585 0.1806415
+3 0.8193585 0.1806415
+4 0.6730328 0.3269672
+5 0.8193585 0.1806415
+6 0.8250890 0.1749110</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>(<span class="fu">logLoss</span>(diabmodel<span class="sc">$</span>Diabetes_binary, ctpred<span class="sc">$</span>Yes))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.4576252</code></pre>
+<pre><code>[1] 0.4511453</code></pre>
 </div>
 </div>
 </section>
@@ -533,8 +575,8 @@ Tuning parameter 'min.node.size' was held constant at a value of 100</code></pre
 <div class="cell">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(treeFit1, <span class="at">newdata =</span> predvec, <span class="at">type =</span> <span class="st">"prob"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>         No        Yes
-1 0.9363272 0.06367278</code></pre>
+<pre><code>         No       Yes
+1 0.8193585 0.1806415</code></pre>
 </div>
 </div>
 <blockquote class="blockquote">
@@ -555,7 +597,7 @@ Tuning parameter 'min.node.size' was held constant at a value of 100</code></pre
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predct</span>(<span class="dv">50</span>, <span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">6</span>, <span class="dv">8</span>, <span class="dv">10</span>, <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>         No       Yes
-1 0.7515312 0.2484688</code></pre>
+1 0.9440331 0.0559669</code></pre>
 </div>
 </div>
 </section>
@@ -607,6 +649,7 @@ Resampling results:
 <p><a href="EDA.html">Click here for the EDA Page</a></p>
 
 
+</section>
 </section>
 </section>
 
